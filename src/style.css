@@ -1,0 +1,253 @@
+:root {
+  --bg-dark: #0f0f0f;
+  --bg-panel: #1a1a1a;
+  --bg-sidebar: #141414;
+  --accent: #00a8ff;
+  --border: #333;
+  --text: #eee;
+  --text-dim: #888;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg-dark);
+  color: var(--text);
+  height: 100vh;
+  overflow: hidden;
+}
+
+#app-container {
+  display: grid;
+  grid-template-columns: 200px 1fr 300px;
+  height: 100%;
+}
+
+/* Sidebar */
+#sidebar {
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  padding: 20px 0;
+}
+
+.sidebar-header {
+  padding: 0 20px;
+  margin-bottom: 30px;
+}
+
+.sidebar-header h2 {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+}
+
+#lesson-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.lesson-item {
+  padding: 12px 20px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.lesson-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.lesson-item.active {
+  background: rgba(0, 168, 255, 0.1);
+  border-left-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Main Viewport */
+#viewport {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: radial-gradient(circle at center, #1a1a1a 0%, #0f0f0f 100%);
+}
+
+#viewport header {
+  position: absolute;
+  top: 20px;
+}
+
+#viewport h1 {
+  font-size: 18px;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+.canvas-wrapper {
+  background: #000;
+  box-shadow: 0 0 40px rgba(0,0,0,0.8);
+  border: 1px solid var(--border);
+  position: relative;
+}
+
+#controls-container {
+  margin-top: 30px;
+  min-width: 300px;
+}
+
+/* Learning Panel */
+#learning-panel {
+  background: var(--bg-panel);
+  border-left: 1px solid var(--border);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+}
+
+.panel-section {
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 15px;
+}
+
+.panel-section h3 {
+  margin: 0 0 15px 0;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+.inspector-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+#inspector-canvas {
+  background: #000;
+  image-rendering: pixelated;
+  border: 1px solid var(--border);
+}
+
+#pixel-info {
+  width: 100%;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 12px;
+}
+
+#pixel-info p {
+  margin: 5px 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.math-content {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 11px;
+  color: #a9ffad;
+  line-height: 1.6;
+}
+
+.math-box {
+  background: rgba(0, 255, 0, 0.05);
+  border-left: 2px solid #00ff00;
+  padding: 8px;
+  margin-top: 5px;
+  border-radius: 0 4px 4px 0;
+}
+
+b[style*="var(--accent)"] {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 10px;
+}
+
+button {
+  width: 100%;
+  padding: 8px;
+  background: var(--accent);
+  border: none;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+button:hover {
+  filter: brightness(1.1);
+}
+
+/* Markdown Theory Panel */
+#viewport {
+  overflow-y: auto; /* allow scrolling if theory is long */
+  justify-content: flex-start; /* change from center to flex-start for scrolling */
+  padding-top: 60px; /* space for absolute header */
+}
+
+.markdown-body {
+  width: 100%;
+  max-width: 800px;
+  margin-top: 40px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 30px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #d1d5db;
+}
+
+.markdown-body h2, .markdown-body h3 {
+  color: #fff;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+  margin-top: 24px;
+}
+
+.markdown-body p, .markdown-body ul, .markdown-body ol {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.markdown-body code {
+  font-family: 'JetBrains Mono', monospace;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 85%;
+}
+
+.markdown-body pre {
+  background: #0d1117 !important;
+  padding: 16px;
+  border-radius: 6px;
+  overflow: auto;
+  border: 1px solid var(--border);
+}
+
+.markdown-body pre code {
+  background: transparent;
+  padding: 0;
+  font-size: 13px;
+  color: #e5e7eb;
+}
+
+.markdown-body blockquote {
+  padding: 0 1em;
+  color: var(--text-dim);
+  border-left: 0.25em solid var(--border);
+  margin: 0 0 16px 0;
+}

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2D Graphics Learning Lab</title>
+    <link rel="stylesheet" href="./src/style.css" />
+  </head>
+  <body>
+    <div id="app-container">
+      <!-- Sidebar Navigation -->
+      <nav id="sidebar">
+        <div class="sidebar-header">
+          <h2>Lessons</h2>
+        </div>
+        <ul id="lesson-list">
+          <li class="lesson-item active" data-lesson="blending">1. Blending</li>
+          <li class="lesson-item" data-lesson="transform">2. Transformations</li>
+          <li class="lesson-item" data-lesson="raster">3. Rasterization & SSAA</li>
+          <li class="lesson-item" data-lesson="texture">4. Texture Mapping</li>
+        </ul>
+      </nav>
+
+      <!-- Main Viewport -->
+      <main id="viewport">
+        <header>
+          <h1 id="lesson-title">Pixel Blending (Porter-Duff)</h1>
+        </header>
+        <div class="canvas-wrapper">
+          <canvas id="canvas" width="400" height="400"></canvas>
+        </div>
+        <div id="controls-container"></div>
+        <section id="theory-container" class="markdown-body">
+          <!-- Markdown content injected here -->
+        </section>
+      </main>
+
+      <!-- Right Learning Panel -->
+      <aside id="learning-panel">
+        <section class="panel-section" id="pixel-inspector">
+          <h3>Pixel Inspector</h3>
+          <div class="inspector-content">
+            <canvas id="inspector-canvas" width="150" height="150"></canvas>
+            <div id="pixel-info">
+              <p>Pos: <span id="pos-val">-</span></p>
+              <p>RGBA: <span id="rgba-val">-</span></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel-section" id="math-visualizer">
+          <h3>Math Logic</h3>
+          <div id="math-content" class="math-content">
+            <!-- Dynamic math formulas will go here -->
+            <p class="placeholder">Select a pixel to see math logic.</p>
+          </div>
+        </section>
+
+        <section class="panel-section" id="process-viz">
+          <h3>Process</h3>
+          <div id="process-controls">
+            <button id="btn-scan">Slow Scan Demo</button>
+          </div>
+        </section>
+      </aside>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
