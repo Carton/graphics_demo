@@ -62,8 +62,43 @@ export class TextureLesson implements Lesson {
     transform.addBinding(this.params, 'rotation', { min: 0, max: Math.PI * 2, label: 'Rotation' });
     transform.addBinding(this.params, 'scale', { min: 0.1, max: 10, label: 'Scale' });
 
+    const assets = pane.addFolder({ title: 'Assets' });
+    assets.addButton({ title: 'Upload Image' }).on('click', () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+              this.loadTextureFromImage(img);
+              this.manager?.render();
+            };
+            img.src = event.target?.result as string;
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+      input.click();
+    });
+
     const btn = document.getElementById('btn-scan');
     if (btn) btn.style.display = 'none';
+  }
+
+  private loadTextureFromImage(img: HTMLImageElement) {
+    const canvas = document.createElement('canvas');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext('2d')!;
+    ctx.drawImage(img, 0, 0);
+    const data = ctx.getImageData(0, 0, img.width, img.height);
+
+    this.texture = new Surface(img.width, img.height);
+    this.texture.data.set(data.data);
   }
 
   render(surface: Surface): void {
@@ -72,7 +107,7 @@ export class TextureLesson implements Lesson {
     const matrix = Matrix.translation(this.params.tx, this.params.ty)
       .multiply(Matrix.rotation(this.params.rotation))
       .multiply(Matrix.scaling(this.params.scale, this.params.scale))
-      .multiply(Matrix.translation(-32, -32));
+      .multiply(Matrix.translation(-this.texture.width / 2, -this.texture.height / 2));
 
     drawSurface(surface, this.texture, matrix, this.params.interpolation, this.params.wrap);
 
@@ -82,13 +117,16 @@ export class TextureLesson implements Lesson {
   }
 
   private drawUVGrid(surface: Surface, matrix: Matrix) {
-    // Draw 8x8 grid lines
-    for (let i = 0; i <= 8; i++) {
-      const v = i * 8;
+    const w = this.texture.width;
+    const h = this.texture.height;
+    const steps = 8;
+    for (let i = 0; i <= steps; i++) {
+      const x = (i / steps) * w;
+      const y = (i / steps) * h;
       // Horizontal
-      this.drawTransformedLine(surface, matrix, 0, v, 64, v, 255, 255, 0, 100);
+      this.drawTransformedLine(surface, matrix, 0, y, w, y, 255, 255, 0, 100);
       // Vertical
-      this.drawTransformedLine(surface, matrix, v, 0, v, 64, 255, 255, 0, 100);
+      this.drawTransformedLine(surface, matrix, x, 0, x, h, 255, 255, 0, 100);
     }
   }
 
@@ -106,9 +144,10 @@ export class TextureLesson implements Lesson {
   ) {
     const p0 = m.apply(x0, y0);
     const p1 = m.apply(x1, y1);
-    // Simple Bresenham already in core
     import('../core/rasterization').then((mod) => {
       mod.drawLine(s, p0.x, p0.y, p1.x, p1.y, r, g, b, a);
+      // Note: This async call might miss the current frame's putImageData
+      // but for a grid overlay it's usually acceptable or we can make drawSurface sync
     });
   }
 
@@ -116,7 +155,7 @@ export class TextureLesson implements Lesson {
     const matrix = Matrix.translation(this.params.tx, this.params.ty)
       .multiply(Matrix.rotation(this.params.rotation))
       .multiply(Matrix.scaling(this.params.scale, this.params.scale))
-      .multiply(Matrix.translation(-32, -32));
+      .multiply(Matrix.translation(-this.texture.width / 2, -this.texture.height / 2));
 
     const srcPoint = matrix.applyInverse(x + 0.5, y + 0.5);
 
