@@ -7,7 +7,7 @@ import type { Lesson, LessonManager } from '../main';
 export class RasterLesson implements Lesson {
   id = 'raster';
   title = 'Rasterization & SSAA';
-  
+
   private params = {
     mode: 'Line' as 'Line' | 'GradientTriangle',
     ssaa: 1 as 1 | 2,
@@ -22,7 +22,9 @@ export class RasterLesson implements Lesson {
 
   init(surface: Surface, pane: Pane, manager: LessonManager): void {
     this.manager = manager;
-    pane.addBinding(this.params, 'mode', { options: { 'Line': 'Line', 'Gradient': 'GradientTriangle' } });
+    pane.addBinding(this.params, 'mode', {
+      options: { Line: 'Line', Gradient: 'GradientTriangle' },
+    });
     pane.addBinding(this.params, 'ssaa', { options: { 'None (1x)': 1, 'SSAA 4x (2x2)': 2 } });
     pane.addBinding(this.params, 'lineCount', { min: 1, max: 50, step: 1 });
     pane.addBinding(this.params, 'rotation', { min: 0, max: Math.PI * 2 });
@@ -53,7 +55,7 @@ export class RasterLesson implements Lesson {
     const scale = this.params.ssaa;
     const logicalWidth = surface.width;
     const logicalHeight = surface.height;
-    
+
     if (scale === 1) {
       surface.clear();
       this.drawScene(surface, Matrix.identity(), logicalWidth, logicalHeight);
@@ -69,14 +71,21 @@ export class RasterLesson implements Lesson {
     }
   }
 
-  private drawScene(target: Surface, ssaaMatrix: Matrix, logicalWidth: number, logicalHeight: number) {
+  private drawScene(
+    target: Surface,
+    ssaaMatrix: Matrix,
+    logicalWidth: number,
+    logicalHeight: number,
+  ) {
     const scale = this.params.ssaa;
     const transform = ssaaMatrix
       .multiply(Matrix.translation(logicalWidth / 2, logicalHeight / 2))
       .multiply(Matrix.rotation(this.params.rotation));
 
     let pixelCount = 0;
-    const maxPixels = this.params.showScan ? Math.floor(10000 * this.params.scanProgress) : Infinity;
+    const maxPixels = this.params.showScan
+      ? Math.floor(10000 * this.params.scanProgress)
+      : Infinity;
 
     const onPixel = () => {
       pixelCount++;
@@ -89,14 +98,14 @@ export class RasterLesson implements Lesson {
         const angle = (i / count) * Math.PI * 2;
         const x1 = Math.cos(angle) * 180;
         const y1 = Math.sin(angle) * 180;
-        
+
         const p0 = transform.apply(0, 0);
         const p1 = transform.apply(x1, y1);
-        
+
         drawLine(target, p0.x, p0.y, p1.x, p1.y, 255, 255, 255, 255, (x, y) => {
           if (!onPixel()) target.setPixel(x, y, 0, 0, 0, 0); // Hide if over budget
         });
-        
+
         if (scale > 1) {
           drawLine(target, p0.x + 1, p0.y, p1.x + 1, p1.y, 255, 255, 255, 255, (x, y) => {
             if (!onPixel()) target.setPixel(x, y, 0, 0, 0, 0);
@@ -107,14 +116,14 @@ export class RasterLesson implements Lesson {
       const vertices: [any, any, any] = [
         { x: 0, y: -150 },
         { x: 150, y: 120 },
-        { x: -150, y: 120 }
+        { x: -150, y: 120 },
       ];
       const colors: [any, any, any] = [
         { r: 255, g: 0, b: 0, a: 255 },
         { r: 0, g: 255, b: 0, a: 255 },
-        { r: 0, g: 0, b: 255, a: 255 }
+        { r: 0, g: 0, b: 255, a: 255 },
       ];
-      
+
       // We need to wrap drawGradientTriangle to support scan animation
       // For now, let's keep it simple.
       drawGradientTriangle(target, vertices, colors, transform);

@@ -30,7 +30,7 @@ export class TransformLesson implements Lesson {
 
   init(surface: Surface, pane: Pane, manager: LessonManager): void {
     this.manager = manager;
-    pane.addBinding(this.params, 'mode', { options: { 'Polygon': 'Polygon', 'Surface': 'Surface' } });
+    pane.addBinding(this.params, 'mode', { options: { Polygon: 'Polygon', Surface: 'Surface' } });
     pane.addBinding(this.params, 'tx', { min: 0, max: 400 });
     pane.addBinding(this.params, 'ty', { min: 0, max: 400 });
     pane.addBinding(this.params, 'rotation', { min: 0, max: Math.PI * 2 });
@@ -45,7 +45,7 @@ export class TransformLesson implements Lesson {
   private async startScan(surface: Surface) {
     if (this.isScanning || !this.manager) return;
     this.isScanning = true;
-    
+
     const m = Matrix.translation(this.params.tx, this.params.ty)
       .multiply(Matrix.rotation(this.params.rotation))
       .multiply(Matrix.scaling(this.params.scale, this.params.scale));
@@ -55,37 +55,46 @@ export class TransformLesson implements Lesson {
     let minX, maxX, minY, maxY;
 
     if (this.params.mode === 'Polygon') {
-      const triangle = [{ x: 0, y: 0 }, { x: 100, y: 0 }, { x: 0, y: 100 }];
-      const transformed = triangle.map(v => m.apply(v.x, v.y));
-      minX = Math.floor(Math.min(...transformed.map(v => v.x)));
-      maxX = Math.ceil(Math.max(...transformed.map(v => v.x)));
-      minY = Math.floor(Math.min(...transformed.map(v => v.y)));
-      maxY = Math.ceil(Math.max(...transformed.map(v => v.y)));
-      
+      const triangle = [
+        { x: 0, y: 0 },
+        { x: 100, y: 0 },
+        { x: 0, y: 100 },
+      ];
+      const transformed = triangle.map((v) => m.apply(v.x, v.y));
+      minX = Math.floor(Math.min(...transformed.map((v) => v.x)));
+      maxX = Math.ceil(Math.max(...transformed.map((v) => v.x)));
+      minY = Math.floor(Math.min(...transformed.map((v) => v.y)));
+      maxY = Math.ceil(Math.max(...transformed.map((v) => v.y)));
+
       this.drawBoundingBox(surface, minX, maxX, minY, maxY);
       this.manager.render();
 
       for (let py = minY; py <= maxY; py++) {
         for (let px = minX; px <= maxX; px++) {
           const sourcePoint = m.applyInverse(px + 0.5, py + 0.5);
-          if (sourcePoint.x >= 0 && sourcePoint.y >= 0 && (sourcePoint.x + sourcePoint.y <= 100)) {
+          if (sourcePoint.x >= 0 && sourcePoint.y >= 0 && sourcePoint.x + sourcePoint.y <= 100) {
             surface.setPixel(px, py, 0, 168, 255, 255);
           } else {
             surface.setPixel(px, py, 40, 40, 40, 255);
           }
         }
         this.manager.render();
-        await new Promise(r => setTimeout(r, 10));
+        await new Promise((r) => setTimeout(r, 10));
       }
     } else {
       // Surface mode scan
       const centeredM = m.multiply(Matrix.translation(-25, -25));
-      const corners = [{x:0,y:0}, {x:50,y:0}, {x:50,y:50}, {x:0,y:50}];
-      const transformed = corners.map(v => centeredM.apply(v.x, v.y));
-      minX = Math.floor(Math.min(...transformed.map(v => v.x)));
-      maxX = Math.ceil(Math.max(...transformed.map(v => v.x)));
-      minY = Math.floor(Math.min(...transformed.map(v => v.y)));
-      maxY = Math.ceil(Math.max(...transformed.map(v => v.y)));
+      const corners = [
+        { x: 0, y: 0 },
+        { x: 50, y: 0 },
+        { x: 50, y: 50 },
+        { x: 0, y: 50 },
+      ];
+      const transformed = corners.map((v) => centeredM.apply(v.x, v.y));
+      minX = Math.floor(Math.min(...transformed.map((v) => v.x)));
+      maxX = Math.ceil(Math.max(...transformed.map((v) => v.x)));
+      minY = Math.floor(Math.min(...transformed.map((v) => v.y)));
+      maxY = Math.ceil(Math.max(...transformed.map((v) => v.y)));
 
       this.drawBoundingBox(surface, minX, maxX, minY, maxY);
       this.manager.render();
@@ -94,21 +103,30 @@ export class TransformLesson implements Lesson {
         for (let px = minX; px <= maxX; px++) {
           const srcPoint = centeredM.applyInverse(px + 0.5, py + 0.5);
           if (srcPoint.x >= 0 && srcPoint.x < 50 && srcPoint.y >= 0 && srcPoint.y < 50) {
-            const sampled = this.srcSurface.getPixel(Math.floor(srcPoint.x), Math.floor(srcPoint.y));
+            const sampled = this.srcSurface.getPixel(
+              Math.floor(srcPoint.x),
+              Math.floor(srcPoint.y),
+            );
             surface.setPixel(px, py, sampled.r, sampled.g, sampled.b, sampled.a);
           } else {
             surface.setPixel(px, py, 40, 40, 40, 255);
           }
         }
         this.manager.render();
-        await new Promise(r => setTimeout(r, 10));
+        await new Promise((r) => setTimeout(r, 10));
       }
     }
-    
+
     this.isScanning = false;
   }
 
-  private drawBoundingBox(surface: Surface, minX: number, maxX: number, minY: number, maxY: number) {
+  private drawBoundingBox(
+    surface: Surface,
+    minX: number,
+    maxX: number,
+    minY: number,
+    maxY: number,
+  ) {
     // Clip to screen
     const sX = Math.max(0, minX);
     const eX = Math.min(surface.width - 1, maxX);
@@ -133,7 +151,11 @@ export class TransformLesson implements Lesson {
       .multiply(Matrix.scaling(this.params.scale, this.params.scale));
 
     if (this.params.mode === 'Polygon') {
-      const triangle = [{ x: 0, y: 0 }, { x: 100, y: 0 }, { x: 0, y: 100 }];
+      const triangle = [
+        { x: 0, y: 0 },
+        { x: 100, y: 0 },
+        { x: 0, y: 100 },
+      ];
       drawPolygon(surface, triangle, m, 0, 168, 255, 255);
     } else {
       const centeredM = m.multiply(Matrix.translation(-25, -25));

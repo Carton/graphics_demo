@@ -19,7 +19,7 @@ export function drawLine(
   g: number,
   b: number,
   a: number,
-  onPixel?: (x: number, y: number) => void
+  onPixel?: (x: number, y: number) => void,
 ): void {
   x0 = Math.floor(x0);
   y0 = Math.floor(y0);
@@ -62,7 +62,7 @@ export function getBarycentric(p: Point, a: Point, b: Point, c: Point) {
   const d20 = v2.x * v0.x + v2.y * v0.y;
   const d21 = v2.x * v1.x + v2.y * v1.y;
   const denom = d00 * d11 - d01 * d01;
-  
+
   if (Math.abs(denom) < 1e-6) return null; // Degenerate triangle
 
   const v = (d11 * d20 - d01 * d21) / denom;
@@ -80,9 +80,9 @@ export function drawGradientTriangle(
   colors: [
     { r: number; g: number; b: number; a: number },
     { r: number; g: number; b: number; a: number },
-    { r: number; g: number; b: number; a: number }
+    { r: number; g: number; b: number; a: number },
   ],
-  matrix: Matrix
+  matrix: Matrix,
 ): void {
   const p0 = matrix.apply(vertices[0].x, vertices[0].y);
   const p1 = matrix.apply(vertices[1].x, vertices[1].y);
@@ -138,11 +138,14 @@ export function drawPolygon(
   g: number,
   b: number,
   a: number,
-  onPixel?: (x: number, y: number) => void
+  onPixel?: (x: number, y: number) => void,
 ): void {
   if (vertices.length < 3) return;
-  const transformedVertices = vertices.map(v => matrix.apply(v.x, v.y));
-  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  const transformedVertices = vertices.map((v) => matrix.apply(v.x, v.y));
+  let minX = Infinity,
+    maxX = -Infinity,
+    minY = Infinity,
+    maxY = -Infinity;
   for (const v of transformedVertices) {
     minX = Math.min(minX, v.x);
     maxX = Math.max(maxX, v.x);
@@ -172,9 +175,12 @@ export function drawPolygon(
 export function downsample(src: Surface, dst: Surface, scale: number): void {
   for (let y = 0; y < dst.height; y++) {
     for (let x = 0; x < dst.width; x++) {
-      let r = 0, g = 0, b = 0, a = 0;
+      let r = 0,
+        g = 0,
+        b = 0,
+        a = 0;
       const count = scale * scale;
-      
+
       for (let sy = 0; sy < scale; sy++) {
         for (let sx = 0; sx < scale; sx++) {
           const p = src.getPixel(x * scale + sx, y * scale + sy);
@@ -184,7 +190,7 @@ export function downsample(src: Surface, dst: Surface, scale: number): void {
           a += p.a;
         }
       }
-      
+
       dst.setPixel(x, y, r / count, g / count, b / count, a / count);
     }
   }
@@ -193,7 +199,12 @@ export function downsample(src: Surface, dst: Surface, scale: number): void {
 /**
  * Samples a surface at (x, y) using nearest neighbor interpolation.
  */
-export function sampleNearest(surface: Surface, x: number, y: number, wrap: 'clamp' | 'transparent' = 'transparent') {
+export function sampleNearest(
+  surface: Surface,
+  x: number,
+  y: number,
+  wrap: 'clamp' | 'transparent' = 'transparent',
+) {
   const ix = Math.round(x);
   const iy = Math.round(y);
 
@@ -201,7 +212,7 @@ export function sampleNearest(surface: Surface, x: number, y: number, wrap: 'cla
     if (wrap === 'transparent') return { r: 0, g: 0, b: 0, a: 0 };
     return surface.getPixel(
       Math.max(0, Math.min(ix, surface.width - 1)),
-      Math.max(0, Math.min(iy, surface.height - 1))
+      Math.max(0, Math.min(iy, surface.height - 1)),
     );
   }
   return surface.getPixel(ix, iy);
@@ -210,20 +221,28 @@ export function sampleNearest(surface: Surface, x: number, y: number, wrap: 'cla
 /**
  * Samples a surface at (x, y) using bilinear interpolation.
  */
-export function sampleBilinear(surface: Surface, x: number, y: number, wrap: 'clamp' | 'transparent' = 'transparent') {
+export function sampleBilinear(
+  surface: Surface,
+  x: number,
+  y: number,
+  wrap: 'clamp' | 'transparent' = 'transparent',
+) {
   const x0 = Math.floor(x);
   const y0 = Math.floor(y);
   const x1 = x0 + 1;
   const y1 = y0 + 1;
 
   if (x0 < 0 || x1 >= surface.width || y0 < 0 || y1 >= surface.height) {
-    if (wrap === 'transparent' && (x < -0.5 || x > surface.width - 0.5 || y < -0.5 || y > surface.height - 0.5)) {
+    if (
+      wrap === 'transparent' &&
+      (x < -0.5 || x > surface.width - 0.5 || y < -0.5 || y > surface.height - 0.5)
+    ) {
       return { r: 0, g: 0, b: 0, a: 0 };
     }
     // Clamp coordinates for the 4-pixel grid
     const clampX = (v: number) => Math.max(0, Math.min(v, surface.width - 1));
     const clampY = (v: number) => Math.max(0, Math.min(v, surface.height - 1));
-    
+
     const u = x - x0;
     const v = y - y0;
     const p00 = surface.getPixel(clampX(x0), clampY(y0));
@@ -262,11 +281,19 @@ export function drawSurface(
   src: Surface,
   matrix: Matrix,
   interpolation: 'nearest' | 'bilinear' = 'bilinear',
-  wrap: 'clamp' | 'transparent' = 'transparent'
+  wrap: 'clamp' | 'transparent' = 'transparent',
 ): void {
-  const corners = [{ x: 0, y: 0 }, { x: src.width, y: 0 }, { x: src.width, y: src.height }, { x: 0, y: src.height }];
-  const transformedCorners = corners.map(c => matrix.apply(c.x, c.y));
-  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  const corners = [
+    { x: 0, y: 0 },
+    { x: src.width, y: 0 },
+    { x: src.width, y: src.height },
+    { x: 0, y: src.height },
+  ];
+  const transformedCorners = corners.map((c) => matrix.apply(c.x, c.y));
+  let minX = Infinity,
+    maxX = -Infinity,
+    minY = Infinity,
+    maxY = -Infinity;
   for (const c of transformedCorners) {
     minX = Math.min(minX, c.x);
     maxX = Math.max(maxX, c.x);
@@ -294,11 +321,13 @@ export function drawSurface(
           const dstP = dst.getPixel(x, y);
           const alpha = sampled.a / 255;
           const invAlpha = 1 - alpha;
-          dst.setPixel(x, y, 
+          dst.setPixel(
+            x,
+            y,
             sampled.r * alpha + dstP.r * invAlpha,
             sampled.g * alpha + dstP.g * invAlpha,
             sampled.b * alpha + dstP.b * invAlpha,
-            Math.max(sampled.a, dstP.a)
+            Math.max(sampled.a, dstP.a),
           );
         }
       }

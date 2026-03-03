@@ -7,7 +7,7 @@ import type { Lesson, LessonManager } from '../main';
 export class TextureLesson implements Lesson {
   id = 'texture';
   title = 'Texture Mapping & Bilinear Filtering';
-  
+
   private params = {
     tx: 200,
     ty: 200,
@@ -40,8 +40,12 @@ export class TextureLesson implements Lesson {
 
   init(surface: Surface, pane: Pane, manager: LessonManager): void {
     this.manager = manager;
-    pane.addBinding(this.params, 'interpolation', { options: { 'Nearest Neighbor': 'nearest', 'Bilinear': 'bilinear' } });
-    pane.addBinding(this.params, 'wrap', { options: { 'Clamp': 'clamp', 'Transparent': 'transparent' } });
+    pane.addBinding(this.params, 'interpolation', {
+      options: { 'Nearest Neighbor': 'nearest', Bilinear: 'bilinear' },
+    });
+    pane.addBinding(this.params, 'wrap', {
+      options: { Clamp: 'clamp', Transparent: 'transparent' },
+    });
     pane.addBinding(this.params, 'tx', { min: 0, max: 400 });
     pane.addBinding(this.params, 'ty', { min: 0, max: 400 });
     pane.addBinding(this.params, 'rotation', { min: 0, max: Math.PI * 2 });
@@ -53,7 +57,7 @@ export class TextureLesson implements Lesson {
 
   render(surface: Surface): void {
     surface.clear();
-    
+
     // Transform to center of texture then apply params
     const matrix = Matrix.translation(this.params.tx, this.params.ty)
       .multiply(Matrix.rotation(this.params.rotation))
@@ -68,9 +72,9 @@ export class TextureLesson implements Lesson {
       .multiply(Matrix.rotation(this.params.rotation))
       .multiply(Matrix.scaling(this.params.scale, this.params.scale))
       .multiply(Matrix.translation(-32, -32));
-    
+
     const srcPoint = matrix.applyInverse(x + 0.5, y + 0.5);
-    
+
     return `
       <b style="color: var(--accent)">Texture Inspector</b>
       <div style="font-size: 10px; color: #888">
@@ -78,11 +82,15 @@ export class TextureLesson implements Lesson {
         UV: (${srcPoint.x.toFixed(2)}, ${srcPoint.y.toFixed(2)})
       </div>
       <div style="margin-top: 10px; border-top: 1px solid #444; pt: 5px">
-        ${this.params.interpolation === 'bilinear' ? `
+        ${
+          this.params.interpolation === 'bilinear'
+            ? `
           <code style="font-size: 9px; color: #00ff00">
             f(u,v) = p00(1-du)(1-dv) + ...
           </code>
-        ` : 'Nearest pixel sampling.'}
+        `
+            : 'Nearest pixel sampling.'
+        }
       </div>
     `;
   }

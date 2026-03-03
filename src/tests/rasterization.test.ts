@@ -35,7 +35,6 @@ describe('Rasterization', () => {
   });
 
   it('should draw a convex polygon (triangle)', () => {
-
     const s = new Surface(10, 10);
     const vertices = [
       { x: 0, y: 0 },
@@ -83,7 +82,7 @@ describe('Bilinear Interpolation', () => {
     s.setPixel(1, 0, 0, 0, 255, 255);
     s.setPixel(0, 1, 0, 255, 0, 255);
     s.setPixel(1, 1, 255, 255, 255, 255);
-    
+
     // Sample at (0.5, 0.5) -> average of all 4
     const result = sampleBilinear(s, 0.5, 0.5);
     // Red: (255 + 0 + 0 + 255) / 4 = 510 / 4 = 127.5

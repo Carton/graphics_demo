@@ -21,9 +21,9 @@ export class BlendingLesson implements Lesson {
     pane.addBinding(this.params, 'mode', {
       options: {
         'Source Over': 'src-over',
-        'Source': 'src',
-        'Destination': 'dst',
-        'Clear': 'clear',
+        Source: 'src',
+        Destination: 'dst',
+        Clear: 'clear',
       },
     });
     pane.addBinding(this.params, 'srcColor', { label: 'Source (Top)' });
@@ -46,17 +46,29 @@ export class BlendingLesson implements Lesson {
     // Phase 1: Draw Destination
     for (let py = 50; py < 250; py++) {
       for (let px = 50; px < 250; px++) {
-        surface.setPixel(px, py, this.params.dstColor.r, this.params.dstColor.g, this.params.dstColor.b, this.params.dstColor.a * 255);
+        surface.setPixel(
+          px,
+          py,
+          this.params.dstColor.r,
+          this.params.dstColor.g,
+          this.params.dstColor.b,
+          this.params.dstColor.a * 255,
+        );
       }
       if (py % 10 === 0) {
         this.manager.render();
-        await new Promise(r => setTimeout(r, 10));
+        await new Promise((r) => setTimeout(r, 10));
       }
     }
 
     // Phase 2: Slow Blend Source
-    const srcPixel = premultiply(this.params.srcColor.r, this.params.srcColor.g, this.params.srcColor.b, Math.round(this.params.srcColor.a * 255));
-    
+    const srcPixel = premultiply(
+      this.params.srcColor.r,
+      this.params.srcColor.g,
+      this.params.srcColor.b,
+      Math.round(this.params.srcColor.a * 255),
+    );
+
     for (let py = 150; py < 350; py++) {
       for (let px = 150; px < 350; px++) {
         const dstPixel = surface.getPixel(px, py);
@@ -65,7 +77,7 @@ export class BlendingLesson implements Lesson {
       }
       if (py % 2 === 0) {
         this.manager.render();
-        await new Promise(r => setTimeout(r, 16));
+        await new Promise((r) => setTimeout(r, 16));
       }
     }
 
@@ -75,7 +87,7 @@ export class BlendingLesson implements Lesson {
   render(surface: Surface): void {
     if (this.isScanning) return;
     surface.clear();
-    
+
     const w = surface.width;
     const h = surface.height;
 
@@ -86,7 +98,15 @@ export class BlendingLesson implements Lesson {
     this.drawSimpleRect(surface, 150, 150, 200, 200, this.params.srcColor, this.params.mode);
   }
 
-  private drawSimpleRect(s: Surface, x: number, y: number, w: number, h: number, color: any, mode: BlendMode) {
+  private drawSimpleRect(
+    s: Surface,
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    color: any,
+    mode: BlendMode,
+  ) {
     const srcPixel = premultiply(color.r, color.g, color.b, Math.round(color.a * 255));
     for (let py = y; py < y + h; py++) {
       for (let px = x; px < x + w; px++) {
@@ -101,12 +121,12 @@ export class BlendingLesson implements Lesson {
   updateInspector(x: number, y: number, surface: Surface): string {
     const p = surface.getPixel(x, y);
     const mode = this.params.mode;
-    
+
     // In a real study tool, we might want to store original src/dst before blending
     // But for this demo, let's show the result and the active formula
-    
+
     let formula = '';
-    let colorPreview = `rgba(${p.r},${p.g},${p.b},${p.a/255})`;
+    let colorPreview = `rgba(${p.r},${p.g},${p.b},${p.a / 255})`;
 
     if (mode === 'src-over') {
       formula = `
@@ -124,7 +144,7 @@ export class BlendingLesson implements Lesson {
     } else {
       formula = `<b style="color: var(--accent)">Mode: ${mode}</b><br/>Calculation active.`;
     }
-    
+
     return `
       <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px">
         <div style="width: 20px; height: 20px; background: ${colorPreview}; border: 1px solid #fff"></div>

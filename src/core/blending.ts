@@ -3,7 +3,7 @@ import type { Pixel } from './surface';
 /**
  * Premultiplies the color components by the alpha value.
  * Alpha is expected to be in range [0, 255].
- * 
+ *
  * Formula: C' = C * (A / 255)
  */
 export function premultiply(r: number, g: number, b: number, a: number): Pixel {
@@ -18,7 +18,7 @@ export function premultiply(r: number, g: number, b: number, a: number): Pixel {
 
 /**
  * Unpremultiplies the color components (reverses premultiplication).
- * 
+ *
  * Formula: C = C' / (A / 255)
  */
 export function unpremultiply(pr: number, pg: number, pb: number, pa: number): Pixel {

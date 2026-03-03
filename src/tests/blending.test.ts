@@ -4,9 +4,12 @@ import { premultiply, unpremultiply, blend } from '../core/blending';
 describe('Premultiplied Alpha Helpers', () => {
   it('should correctly premultiply alpha', () => {
     // White pixel with 50% alpha (128)
-    const r = 255, g = 255, b = 255, a = 128;
+    const r = 255,
+      g = 255,
+      b = 255,
+      a = 128;
     const result = premultiply(r, g, b, a);
-    
+
     // r * (a/255) => 255 * (128/255) approx 128
     expect(result.r).toBeCloseTo(128, 0);
     expect(result.g).toBeCloseTo(128, 0);
@@ -15,9 +18,12 @@ describe('Premultiplied Alpha Helpers', () => {
   });
 
   it('should correctly unpremultiply alpha', () => {
-    const pr = 128, pg = 128, pb = 128, pa = 128;
+    const pr = 128,
+      pg = 128,
+      pb = 128,
+      pa = 128;
     const result = unpremultiply(pr, pg, pb, pa);
-    
+
     // pr / (pa/255) => 128 / (128/255) approx 255
     expect(result.r).toBeCloseTo(255, 0);
     expect(result.g).toBeCloseTo(255, 0);
@@ -56,7 +62,7 @@ describe('Porter-Duff Operators', () => {
     const src = { r: 128, g: 0, b: 0, a: 128 };
     const dst = { r: 0, g: 255, b: 0, a: 255 };
     const result = blend(src, dst, 'src-over');
-    
+
     // a = sa + da*(1 - sa/255) => 128 + 255*(1 - 0.5) = 128 + 127 = 255
     // r = sr + dr*(1 - sa/255) => 128 + 0 = 128
     // g = sg + dg*(1 - sa/255) => 0 + 255*(0.5) = 127.5

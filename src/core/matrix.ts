@@ -12,7 +12,7 @@ export class Matrix {
     public c: number = 0,
     public d: number = 1,
     public tx: number = 0,
-    public ty: number = 0
+    public ty: number = 0,
   ) {}
 
   /**
@@ -55,7 +55,7 @@ export class Matrix {
       this.a * other.c + this.c * other.d,
       this.b * other.c + this.d * other.d,
       this.a * other.tx + this.c * other.ty + this.tx,
-      this.b * other.tx + this.d * other.ty + this.ty
+      this.b * other.tx + this.d * other.ty + this.ty,
     );
   }
 
@@ -76,7 +76,7 @@ export class Matrix {
       -this.c * invDet,
       this.a * invDet,
       (this.c * this.ty - this.d * this.tx) * invDet,
-      (this.b * this.tx - this.a * this.ty) * invDet
+      (this.b * this.tx - this.a * this.ty) * invDet,
     );
   }
 

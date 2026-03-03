@@ -20,9 +20,12 @@ describe('Surface', () => {
 
   it('should be able to set and get a pixel', () => {
     const surface = new Surface(10, 10);
-    const r = 255, g = 128, b = 64, a = 200;
+    const r = 255,
+      g = 128,
+      b = 64,
+      a = 200;
     surface.setPixel(5, 5, r, g, b, a);
-    
+
     const pixel = surface.getPixel(5, 5);
     expect(pixel.r).toBe(r);
     expect(pixel.g).toBe(g);

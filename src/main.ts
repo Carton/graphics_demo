@@ -6,11 +6,11 @@ import hljs from 'highlight.js';
 import 'highlight.js/styles/github-dark.css';
 
 marked.setOptions({
-  highlight: function(code, lang) {
+  highlight: function (code, lang) {
     const language = hljs.getLanguage(lang) ? lang : 'plaintext';
     return hljs.highlight(code, { language }).value;
   },
-  langPrefix: 'hljs language-'
+  langPrefix: 'hljs language-',
 });
 
 // Base Lesson Interface
@@ -46,12 +46,12 @@ class LessonManager {
 
   private initNavigation() {
     const items = document.querySelectorAll('.lesson-item');
-    items.forEach(item => {
+    items.forEach((item) => {
       item.addEventListener('click', () => {
         const id = item.getAttribute('data-lesson');
         if (id) this.switchLesson(id);
-        
-        items.forEach(i => i.classList.remove('active'));
+
+        items.forEach((i) => i.classList.remove('active'));
         item.classList.add('active');
       });
     });
@@ -95,10 +95,10 @@ class LessonManager {
         const px = cx + dx;
         const py = cy + dy;
         const p = this.surface.getPixel(px, py);
-        
-        ctx.fillStyle = `rgba(${p.r},${p.g},${p.b},${p.a/255})`;
+
+        ctx.fillStyle = `rgba(${p.r},${p.g},${p.b},${p.a / 255})`;
         ctx.fillRect((dx + 7) * zoom, (dy + 7) * zoom, zoom, zoom);
-        
+
         // Draw grid lines
         ctx.strokeStyle = '#333';
         ctx.lineWidth = 0.5;
@@ -140,14 +140,15 @@ class LessonManager {
     if (this.currentLesson) {
       document.getElementById('lesson-title')!.textContent = this.currentLesson!.title;
       this.currentLesson!.init(this.surface, this.pane, this);
-      
+
       const theoryContainer = document.getElementById('theory-container');
       if (theoryContainer) {
         if (this.currentLesson!.getTheoryContent) {
           const rawContent = this.currentLesson!.getTheoryContent();
           theoryContainer.innerHTML = marked.parse(rawContent) as string;
         } else {
-          theoryContainer.innerHTML = '<p style="color: #888; font-style: italic;">No theory content available for this lesson yet.</p>';
+          theoryContainer.innerHTML =
+            '<p style="color: #888; font-style: italic;">No theory content available for this lesson yet.</p>';
         }
       }
 
@@ -162,7 +163,7 @@ class LessonManager {
     const imageData = new ImageData(
       new Uint8ClampedArray(this.surface.data), // Ensure a fresh copy for display
       this.surface.width,
-      this.surface.height
+      this.surface.height,
     );
     this.ctx.putImageData(imageData, 0, 0);
   }

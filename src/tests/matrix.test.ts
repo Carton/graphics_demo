@@ -4,7 +4,7 @@ import { Matrix } from '../core/matrix';
 describe('Matrix', () => {
   it('should initialize as an identity matrix', () => {
     const m = new Matrix();
-    // Identity: 
+    // Identity:
     // 1 0 0
     // 0 1 0
     expect(m.a).toBe(1);
@@ -69,7 +69,9 @@ describe('Matrix', () => {
 
   it('should yield identity when multiplying a matrix by its inverse', () => {
     // Arbitrary matrix
-    const m = Matrix.translation(10, 20).multiply(Matrix.rotation(Math.PI / 4)).multiply(Matrix.scaling(2, 3));
+    const m = Matrix.translation(10, 20)
+      .multiply(Matrix.rotation(Math.PI / 4))
+      .multiply(Matrix.scaling(2, 3));
     const inv = m.invert();
     const result = m.multiply(inv);
 
