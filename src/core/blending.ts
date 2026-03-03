@@ -34,14 +34,27 @@ export function unpremultiply(pr: number, pg: number, pb: number, pa: number): P
   };
 }
 
-export type BlendMode = 'clear' | 'src' | 'dst' | 'src-over';
+export type BlendMode = 'clear' | 'src' | 'dst' | 'src-over' | 'in' | 'out' | 'atop' | 'xor';
 
 /**
  * Porter-Duff Blending Operator.
  * Assumes source and destination pixels are already PREMULTIPLIED.
+ *
+ * Triple-operand support: dst = (src IN mask) OP dst
+ * If maskAlpha is provided, src is first attenuated by maskAlpha/255.
  */
-export function blend(src: Pixel, dst: Pixel, mode: BlendMode): Pixel {
-  const sa = src.a / 255;
+export function blend(src: Pixel, dst: Pixel, mode: BlendMode, maskAlpha: number = 255): Pixel {
+  // 1. Apply mask: src' = src IN mask
+  const mf = maskAlpha / 255;
+  const s = {
+    r: src.r * mf,
+    g: src.g * mf,
+    b: src.b * mf,
+    a: src.a * mf,
+  };
+
+  const sa = s.a / 255;
+  const da = dst.a / 255;
 
   switch (mode) {
     case 'clear':
@@ -50,7 +63,7 @@ export function blend(src: Pixel, dst: Pixel, mode: BlendMode): Pixel {
 
     case 'src':
       // (S)
-      return { ...src };
+      return s;
 
     case 'dst':
       // (D)
@@ -60,14 +73,58 @@ export function blend(src: Pixel, dst: Pixel, mode: BlendMode): Pixel {
       // S + D * (1 - Sa)
       const invSa = 1 - sa;
       return {
-        r: src.r + dst.r * invSa,
-        g: src.g + dst.g * invSa,
-        b: src.b + dst.b * invSa,
-        a: src.a + dst.a * invSa,
+        r: s.r + dst.r * invSa,
+        g: s.g + dst.g * invSa,
+        b: s.b + dst.b * invSa,
+        a: s.a + dst.a * invSa,
+      };
+    }
+
+    case 'in': {
+      // S * Da
+      return {
+        r: s.r * da,
+        g: s.g * da,
+        b: s.b * da,
+        a: s.a * da,
+      };
+    }
+
+    case 'out': {
+      // S * (1 - Da)
+      const invDa = 1 - da;
+      return {
+        r: s.r * invDa,
+        g: s.g * invDa,
+        b: s.b * invDa,
+        a: s.a * invDa,
+      };
+    }
+
+    case 'atop': {
+      // S * Da + D * (1 - Sa)
+      const invSa = 1 - sa;
+      return {
+        r: s.r * da + dst.r * invSa,
+        g: s.g * da + dst.g * invSa,
+        b: s.b * da + dst.b * invSa,
+        a: s.a * da + dst.a * invSa,
+      };
+    }
+
+    case 'xor': {
+      // S * (1 - Da) + D * (1 - Sa)
+      const invSa = 1 - sa;
+      const invDa = 1 - da;
+      return {
+        r: s.r * invDa + dst.r * invSa,
+        g: s.g * invDa + dst.g * invSa,
+        b: s.b * invDa + dst.b * invSa,
+        a: s.a * invDa + dst.a * invSa,
       };
     }
 
     default:
-      return { ...src };
+      return s;
   }
 }
