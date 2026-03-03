@@ -1,6 +1,6 @@
 import { Pane } from 'tweakpane';
 import { Surface } from '../core/surface';
-import { blend, BlendMode, premultiply } from '../core/blending';
+import { blend, type BlendMode, premultiply } from '../core/blending';
 import { Matrix } from '../core/matrix';
 import { drawSurface } from '../core/rasterization';
 import type { Lesson, LessonManager } from '../main';
