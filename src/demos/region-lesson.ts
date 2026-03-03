@@ -1,6 +1,7 @@
 import { Pane } from 'tweakpane';
 import { Surface } from '../core/surface';
-import { Region, Rectangle } from '../core/region';
+import { Region, type Rectangle } from '../core/region';
+import { drawLine } from '../core/rasterization';
 import type { Lesson, LessonManager } from '../main';
 
 export class RegionLesson implements Lesson {
@@ -101,7 +102,7 @@ export class RegionLesson implements Lesson {
 
   private drawRegion(surface: Surface, r: Region, red: number, g: number, b: number, a: number) {
     for (const rect of r.rects) {
-      for (let y = rect.y1; y < rect.y2; y++) {
+      for (let y = Math.max(0, Math.floor(rect.y1)); y < Math.min(surface.height, Math.ceil(rect.y2)); y++) {
         surface.fillScanline(y, rect.x1, rect.x2, red, g, b, a);
       }
       if (this.params.showDecomposition) {
@@ -131,12 +132,10 @@ export class RegionLesson implements Lesson {
     b: number,
     a: number,
   ) {
-    import('../core/rasterization').then((mod) => {
-      mod.drawLine(s, rect.x1, rect.y1, rect.x2, rect.y1, r, g, b, a);
-      mod.drawLine(s, rect.x2, rect.y1, rect.x2, rect.y2, r, g, b, a);
-      mod.drawLine(s, rect.x2, rect.y2, rect.x1, rect.y2, r, g, b, a);
-      mod.drawLine(s, rect.x1, rect.y2, rect.x1, rect.y1, r, g, b, a);
-    });
+    drawLine(s, rect.x1, rect.y1, rect.x2, rect.y1, r, g, b, a);
+    drawLine(s, rect.x2, rect.y1, rect.x2, rect.y2, r, g, b, a);
+    drawLine(s, rect.x2, rect.y2, rect.x1, rect.y2, r, g, b, a);
+    drawLine(s, rect.x1, rect.y2, rect.x1, rect.y1, r, g, b, a);
   }
 
   updateInspector(x: number, y: number, surface: Surface): string {
