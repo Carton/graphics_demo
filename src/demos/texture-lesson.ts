@@ -1,7 +1,7 @@
-import { Pane } from 'tweakpane';
+﻿import { Pane } from 'tweakpane';
 import { Surface } from '../core/surface';
 import { Matrix } from '../core/matrix';
-import { drawSurface } from '../core/rasterization';
+import { drawSurface, drawLine } from '../core/rasterization';
 import type { Lesson, LessonManager } from '../main';
 
 export class TextureLesson implements Lesson {
@@ -64,16 +64,22 @@ export class TextureLesson implements Lesson {
 
     const assets = pane.addFolder({ title: 'Assets' });
     assets.addButton({ title: 'Upload Image' }).on('click', () => {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*';
+      
+      const input = document.getElementById('texture-upload-input') as HTMLInputElement;
+      if (!input) {
+        
+        return;
+      }
+
       input.onchange = (e) => {
         const file = (e.target as HTMLInputElement).files?.[0];
         if (file) {
+          
           const reader = new FileReader();
           reader.onload = (event) => {
             const img = new Image();
             img.onload = () => {
+              
               this.loadTextureFromImage(img);
               this.manager?.render();
             };
@@ -82,6 +88,7 @@ export class TextureLesson implements Lesson {
           reader.readAsDataURL(file);
         }
       };
+      
       input.click();
     });
 
@@ -99,6 +106,7 @@ export class TextureLesson implements Lesson {
 
     this.texture = new Surface(img.width, img.height);
     this.texture.data.set(data.data);
+    
   }
 
   render(surface: Surface): void {
@@ -144,11 +152,7 @@ export class TextureLesson implements Lesson {
   ) {
     const p0 = m.apply(x0, y0);
     const p1 = m.apply(x1, y1);
-    import('../core/rasterization').then((mod) => {
-      mod.drawLine(s, p0.x, p0.y, p1.x, p1.y, r, g, b, a);
-      // Note: This async call might miss the current frame's putImageData
-      // but for a grid overlay it's usually acceptable or we can make drawSurface sync
-    });
+    drawLine(s, p0.x, p0.y, p1.x, p1.y, r, g, b, a);
   }
 
   updateInspector(x: number, y: number, surface: Surface): string {
@@ -179,7 +183,43 @@ export class TextureLesson implements Lesson {
   }
 
   getTheoryContent(): string {
-    return 'Content to be implemented in Phase 3.';
+    return `
+## 纹理映射 (Texture Mapping) 高级原理
+
+纹理映射是将 2D 图像（纹理）映射到几何图形表面的过程。在 Demo 2 中我们学习了逆向映射，本节将深入探讨采样时的过滤与坐标处理。
+
+### 1. 纹理采样过滤 (Filtering)
+
+当我们反求出纹理坐标 \`(u, v)\` 时，它们通常是浮点数。如何确定该点的颜色取决于过滤算法。
+
+#### 最近邻插值 (Nearest Neighbor)
+最直接的方法是取最近的物理像素点：
+- **公式**：\`ix = round(u)\`, \`iy = round(v)\`
+- **特点**：速度极快，保留硬边缘（像素感），但在缩放或旋转时会有严重的锯齿（Aliasing）。
+
+#### 双线性插值 (Bilinear Filtering)
+为了平滑过渡，我们获取目标点周围的 4 个像素，并根据距离进行加权平均。
+假设小数部分为 \`du = u - floor(u)\`, \`dv = v - floor(v)\`：
+- **公式**：\`f(u,v) = p00(1-du)(1-dv) + p10(du)(1-dv) + p01(1-du)(dv) + p11(du)(dv)\`
+- **代码实现**：
+\`\`\`typescript
+const r = lerp(lerp(p00.r, p10.r, du), lerp(p01.r, p11.r, du), dv);
+\`\`\`
+
+### 2. 环绕模式 (Wrapping)
+
+当采样的坐标 \`(u, v)\` 超出纹理定义的 \`[0, width]\` 或 \`[0, height]\` 范围时，环绕模式决定了如何处理。
+
+- **Clamp-to-Edge**: 强制将坐标限制在边缘。
+  - \`u' = max(0, min(u, width-1))\`
+- **Repeat (平铺)**: 纹理在面上无限重复。
+  - \`u' = u - floor(u / width) * width\` (即取模运算)
+- **Mirror (镜像)**: 纹理在边界处反向，形成无缝镜像。
+  - \`u' = abs(((u / width) + 1) % 2 - 1) * width\`
+
+### 3. UV 网格叠加 (UV Grid)
+在 Demo 中开启 "Show UV Grid" 可以直观地看到纹理坐标系是如何随着仿射变换矩阵（旋转、缩放、偏移）而变形的。黄色网格代表了纹理空间的整数边界。
+    `;
   }
 
   cleanup(): void {}
