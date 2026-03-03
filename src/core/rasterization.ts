@@ -128,7 +128,7 @@ function isPointInPolygon(p: Point, vertices: Point[]): boolean {
 }
 
 /**
- * Draws a transformed convex polygon on a surface.
+ * Draws a transformed convex polygon on a surface using scanline filling.
  */
 export function drawPolygon(
   surface: Surface,
@@ -141,28 +141,38 @@ export function drawPolygon(
   onPixel?: (x: number, y: number) => void,
 ): void {
   if (vertices.length < 3) return;
-  const transformedVertices = vertices.map((v) => matrix.apply(v.x, v.y));
-  let minX = Infinity,
-    maxX = -Infinity,
-    minY = Infinity,
-    maxY = -Infinity;
-  for (const v of transformedVertices) {
-    minX = Math.min(minX, v.x);
-    maxX = Math.max(maxX, v.x);
-    minY = Math.min(minY, v.y);
-    maxY = Math.max(maxY, v.y);
-  }
-  const startX = Math.max(0, Math.floor(minX));
-  const endX = Math.min(surface.width - 1, Math.ceil(maxX));
-  const startY = Math.max(0, Math.floor(minY));
-  const endY = Math.min(surface.height - 1, Math.ceil(maxY));
+  const tv = vertices.map((v) => matrix.apply(v.x, v.y));
 
-  for (let y = startY; y <= endY; y++) {
-    for (let x = startX; x <= endX; x++) {
-      const sourcePoint = matrix.applyInverse(x + 0.5, y + 0.5);
-      if (isPointInPolygon(sourcePoint, vertices)) {
-        surface.setPixel(x, y, r, g, b, a);
-        if (onPixel) onPixel(x, y);
+  let minY = Math.floor(Math.min(...tv.map((v) => v.y)));
+  let maxY = Math.ceil(Math.max(...tv.map((v) => v.y)));
+
+  minY = Math.max(0, minY);
+  maxY = Math.min(surface.height - 1, maxY);
+
+  for (let y = minY; y <= maxY; y++) {
+    const intersections: number[] = [];
+    const scanY = y + 0.5;
+
+    for (let i = 0; i < tv.length; i++) {
+      const p1 = tv[i];
+      const p2 = tv[(i + 1) % tv.length];
+
+      if ((p1.y <= scanY && p2.y > scanY) || (p2.y <= scanY && p1.y > scanY)) {
+        const x = p1.x + ((scanY - p1.y) * (p2.x - p1.x)) / (p2.y - p1.y);
+        intersections.push(x);
+      }
+    }
+
+    intersections.sort((a, b) => a - b);
+
+    for (let i = 0; i < intersections.length; i += 2) {
+      const x1 = intersections[i];
+      const x2 = intersections[i + 1];
+      surface.fillScanline(y, x1, x2, r, g, b, a);
+      if (onPixel) {
+        for (let x = Math.floor(x1); x < Math.ceil(x2); x++) {
+          onPixel(x, y);
+        }
       }
     }
   }
