@@ -4,7 +4,7 @@ import { Matrix } from '../core/matrix';
 import { drawSurface } from '../core/rasterization';
 import type { Lesson, LessonManager } from '../main';
 
-export default class TextureLesson implements Lesson {
+export class TextureLesson implements Lesson {
   id = 'texture';
   title = 'Texture Mapping & Bilinear Filtering';
   

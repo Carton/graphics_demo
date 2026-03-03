@@ -123,19 +123,21 @@ class LessonManager {
     }
 
     // Dynamic import of lesson
-    let lessonModule;
     if (id === 'blending') {
-      lessonModule = await import('./demos/blending-lesson');
+      const { BlendingLesson } = await import('./demos/blending-lesson');
+      this.currentLesson = new BlendingLesson();
     } else if (id === 'transform') {
-      lessonModule = await import('./demos/transform-lesson');
+      const { TransformLesson } = await import('./demos/transform-lesson');
+      this.currentLesson = new TransformLesson();
     } else if (id === 'raster') {
-      lessonModule = await import('./demos/raster-lesson');
+      const { RasterLesson } = await import('./demos/raster-lesson');
+      this.currentLesson = new RasterLesson();
     } else if (id === 'texture') {
-      lessonModule = await import('./demos/texture-lesson');
+      const { TextureLesson } = await import('./demos/texture-lesson');
+      this.currentLesson = new TextureLesson();
     }
 
-    if (lessonModule) {
-      this.currentLesson = new lessonModule.default();
+    if (this.currentLesson) {
       document.getElementById('lesson-title')!.textContent = this.currentLesson!.title;
       this.currentLesson!.init(this.surface, this.pane, this);
       

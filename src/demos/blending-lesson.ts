@@ -4,7 +4,7 @@ import { blend, premultiply } from '../core/blending';
 import type { BlendMode } from '../core/blending';
 import type { Lesson, LessonManager } from '../main';
 
-export default class BlendingLesson implements Lesson {
+export class BlendingLesson implements Lesson {
   id = 'blending';
   title = 'Pixel Blending (Porter-Duff)';
   private params = {

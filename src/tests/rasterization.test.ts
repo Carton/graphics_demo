@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { Surface } from '../core/surface';
 import { Matrix } from '../core/matrix';
-import { drawPolygon, drawLine, sampleSurface } from '../core/rasterization';
+import { drawPolygon, drawLine, sampleBilinear } from '../core/rasterization';
 
 describe('Rasterization', () => {
   it('should draw a horizontal line', () => {
@@ -85,7 +85,7 @@ describe('Bilinear Interpolation', () => {
     s.setPixel(1, 1, 255, 255, 255, 255);
     
     // Sample at (0.5, 0.5) -> average of all 4
-    const result = sampleSurface(s, 0.5, 0.5);
+    const result = sampleBilinear(s, 0.5, 0.5);
     // Red: (255 + 0 + 0 + 255) / 4 = 510 / 4 = 127.5
     expect(result.r).toBeCloseTo(127.5, 0);
     expect(result.g).toBeCloseTo(127.5, 0);

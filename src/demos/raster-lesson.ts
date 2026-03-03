@@ -4,7 +4,7 @@ import { Matrix } from '../core/matrix';
 import { drawLine, drawGradientTriangle, downsample } from '../core/rasterization';
 import type { Lesson, LessonManager } from '../main';
 
-export default class RasterLesson implements Lesson {
+export class RasterLesson implements Lesson {
   id = 'raster';
   title = 'Rasterization & SSAA';
   

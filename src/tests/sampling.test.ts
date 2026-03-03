@@ -26,7 +26,7 @@ describe('Texture Sampling', () => {
     });
 
     it('should handle boundary coordinates', () => {
-        const p = sampleNearest(src, 1.9, 1.9);
+        const p = sampleNearest(src, 1.9, 1.9, 'clamp');
         expect(p.r).toBe(255);
         expect(p.g).toBe(255);
     });

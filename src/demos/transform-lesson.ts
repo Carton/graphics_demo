@@ -4,7 +4,7 @@ import { Matrix } from '../core/matrix';
 import { drawPolygon, drawSurface } from '../core/rasterization';
 import type { Lesson, LessonManager } from '../main';
 
-export default class TransformLesson implements Lesson {
+export class TransformLesson implements Lesson {
   id = 'transform';
   title = '2D Affine Transformations';
   private params = {
