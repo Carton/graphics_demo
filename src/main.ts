@@ -43,19 +43,19 @@ class LessonManager {
     this.initNavigation();
     this.initInspector();
   }
-
-  private initNavigation() {
-    const items = document.querySelectorAll('.lesson-item');
-    items.forEach((item) => {
-      item.addEventListener('click', () => {
-        const id = item.getAttribute('data-lesson');
-        if (id) this.switchLesson(id);
-
+private initNavigation() {
+  const items = document.querySelectorAll('.lesson-item');
+  items.forEach((item) => {
+    item.addEventListener('click', () => {
+      const id = (item as HTMLElement).dataset.lesson;
+      if (id) {
+        this.switchLesson(id);
         items.forEach((i) => i.classList.remove('active'));
         item.classList.add('active');
-      });
+      }
     });
-  }
+  });
+}
 
   private initInspector() {
     const inspectorCanvas = document.getElementById('inspector-canvas') as HTMLCanvasElement;
@@ -134,6 +134,9 @@ class LessonManager {
     } else if (id === 'texture') {
       const { TextureLesson } = await import('./demos/texture-lesson');
       this.currentLesson = new TextureLesson();
+    } else if (id === 'region') {
+      const { RegionLesson } = await import('./demos/region-lesson');
+      this.currentLesson = new RegionLesson();
     }
 
     if (this.currentLesson) {
