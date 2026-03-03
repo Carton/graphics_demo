@@ -26,3 +26,57 @@ describe('Region Data Structure', () => {
     expect(r.contains(20, 20)).toBe(false); // Right-exclusive
   });
 });
+
+describe('Region Boolean Operations', () => {
+  it('should compute union of two rectangles', () => {
+    const r1 = new Region([{ x1: 0, y1: 0, x2: 10, y2: 10 }]);
+    const r2 = new Region([{ x1: 5, y1: 5, x2: 15, y2: 15 }]);
+    const result = r1.union(r2);
+    
+    expect(result.contains(2, 2)).toBe(true);
+    expect(result.contains(7, 7)).toBe(true);
+    expect(result.contains(12, 12)).toBe(true);
+    expect(result.contains(16, 16)).toBe(false);
+  });
+
+  it('should compute intersection of two rectangles', () => {
+    const r1 = new Region([{ x1: 0, y1: 0, x2: 10, y2: 10 }]);
+    const r2 = new Region([{ x1: 5, y1: 5, x2: 15, y2: 15 }]);
+    const result = r1.intersect(r2);
+    
+    expect(result.contains(7, 7)).toBe(true);
+    expect(result.contains(2, 2)).toBe(false);
+    expect(result.getBounds()).toEqual({ x1: 5, y1: 5, x2: 10, y2: 10 });
+  });
+
+  it('should compute subtraction of two rectangles', () => {
+    const r1 = new Region([{ x1: 0, y1: 0, x2: 10, y2: 10 }]);
+    const r2 = new Region([{ x1: 5, y1: 0, x2: 15, y2: 10 }]);
+    const result = r1.subtract(r2);
+    
+    expect(result.contains(2, 5)).toBe(true);
+    expect(result.contains(7, 5)).toBe(false);
+    expect(result.getBounds()).toEqual({ x1: 0, y1: 0, x2: 5, y2: 10 });
+  });
+
+  it('should compute XOR of two rectangles', () => {
+    const r1 = new Region([{ x1: 0, y1: 0, x2: 10, y2: 10 }]);
+    const r2 = new Region([{ x1: 5, y1: 0, x2: 15, y2: 10 }]);
+    const result = r1.xor(r2);
+    
+    expect(result.contains(2, 5)).toBe(true);
+    expect(result.contains(7, 5)).toBe(false);
+    expect(result.contains(12, 5)).toBe(true);
+  });
+
+  it('should optimize and merge rectangles vertically', () => {
+    // Two vertically adjacent rects with same X span
+    const r1 = new Region([{ x1: 0, y1: 0, x2: 10, y2: 5 }]);
+    const r2 = new Region([{ x1: 0, y1: 5, x2: 10, y2: 10 }]);
+    const result = r1.union(r2);
+    
+    // Result should be a single 10x10 rect
+    expect(result.rects).toHaveLength(1);
+    expect(result.rects[0]).toEqual({ x1: 0, y1: 0, x2: 10, y2: 10 });
+  });
+});
