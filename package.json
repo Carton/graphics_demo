@@ -13,10 +13,14 @@
     "prepare": "husky"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/highlight.js": "^9.12.4",
     "@types/marked": "^5.0.2",
     "@types/node": "^25.3.3",
+    "@typescript-eslint/eslint-plugin": "^8.56.1",
+    "@typescript-eslint/parser": "^8.56.1",
     "eslint": "^10.0.2",
+    "globals": "^17.4.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.3.1",
     "prettier": "^3.8.1",
