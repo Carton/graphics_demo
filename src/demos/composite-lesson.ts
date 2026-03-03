@@ -175,7 +175,67 @@ export class CompositeLesson implements Lesson {
   }
 
   getTheoryContent(): string {
-    return 'Content to be implemented in Phase 3.';
+    return `
+## 三元合成模型 (Source, Mask, Destination)
+
+在先前的 Demo 1 中，我们了解了 **Porter-Duff 合成规则**，也就是图层 A (Source) 与图层 B (Destination) 是如何相互混合的：\`D = S OP D\`。
+
+然而，在工业级图形库（如 **Pixman**, Cairo, Skia）中，最底层的合成流水线通常是一个**三元模型**，引入了一个非常重要的中间层：**Mask (遮罩)**。
+
+### 1. 核心管线公式
+
+在 Pixman 的源码中，其核心 API \`pixman_image_composite\` 的数学模型严格定义为：
+> **\`Destination = (Source IN Mask) OP Destination\`**
+
+这意味着混合是分两步进行的：
+1. **Mask 调制 (Attenuation)**：首先，提取 Mask 图像中对应像素的 Alpha 通道（通常忽略其 RGB，或 Mask 本身就是一个 \`a8\` 即只有 alpha 通道的图像）。用这个 Alpha 值来乘以 Source 图像的四个通道（预乘后）。这等价于执行了一次 \`Source IN Mask\` 的操作。
+2. **OP 混合 (Blending)**：然后，拿着调制后的新 Source，根据指定的 \`Operator\` (如 SrcOver, In, Out) 与 Destination 进行最终混合。
+
+### 2. 代码解析
+
+在我们的实现中，为了模拟这一过程，我们提取了 Mask 的 Alpha 值，并在传入 \`blend\` 引擎前应用了调制：
+
+\`\`\`typescript
+// src 和 dst 必须是预乘(premultiplied)格式的像素
+export function blend(src: Pixel, dst: Pixel, mode: BlendMode, maskAlpha: number = 255): Pixel {
+  // 1. Apply mask: src' = src IN mask
+  // maskAlpha 的范围是 0-255，将其归一化到 0.0-1.0
+  const mf = maskAlpha / 255;
+  const s = {
+    r: src.r * mf,
+    g: src.g * mf,
+    b: src.b * mf,
+    a: src.a * mf,
+  };
+
+  // 2. 提取后续混合所需的 Alpha 值
+  const sa = s.a / 255;
+  const da = dst.a / 255;
+
+  // 3. 执行常规的 Porter-Duff 混合
+  switch (mode) {
+    case 'src-over': {
+      // S + D * (1 - Sa)
+      const invSa = 1 - sa;
+      return {
+        r: s.r + dst.r * invSa,
+        g: s.g + dst.g * invSa,
+        ...
+      };
+    }
+    // ...
+  }
+}
+\`\`\`
+
+### 3. 为什么需要独立的 Mask 层？
+
+在图形界面系统中，独立的 Mask 设计带来了极大的灵活性：
+- **字体渲染**: 文本字形通常被缓存为仅包含 Alpha 值的位图（即 Mask）。渲染时，Source 设置为当前画笔颜色（如蓝色），通过 \`pixman_image_composite\` 就能将文字以任意颜色绘制到屏幕上。
+- **矢量裁剪 (Anti-aliased Clipping)**: 在 Demo 5 中我们看到了矩形区域裁剪。但如何裁剪出一个平滑的圆形？答案是生成一个带抗锯齿边缘的圆形蒙版（Mask），然后执行复合操作。
+
+在当前的交互沙盒中，你可以独立移动 **Source Layer** 和 **Mask Layer**，直观地感受到 Mask 是如何像一个透明的窗口一样，限制了 Source 像素对底层的影响。
+    `;
   }
 
   cleanup(): void {}
