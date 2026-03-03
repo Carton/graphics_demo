@@ -6,7 +6,7 @@ import type { Lesson, LessonManager } from '../main';
 
 export class TextureLesson implements Lesson {
   id = 'texture';
-  title = 'Advanced Texture Mapping (Demo 4)';
+  title = 'Advanced Texture Mapping';
 
   private params = {
     tx: 200,

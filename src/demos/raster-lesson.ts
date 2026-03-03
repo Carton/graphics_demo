@@ -113,12 +113,20 @@ export class RasterLesson implements Lesson {
         }
       }
     } else {
-      const vertices: [{ x: number; y: number }, { x: number; y: number }, { x: number; y: number }] = [
+      const vertices: [
+        { x: number; y: number },
+        { x: number; y: number },
+        { x: number; y: number },
+      ] = [
         { x: 0, y: -150 },
         { x: 150, y: 120 },
         { x: -150, y: 120 },
       ];
-      const colors: [{ r: number; g: number; b: number; a: number }, { r: number; g: number; b: number; a: number }, { r: number; g: number; b: number; a: number }] = [
+      const colors: [
+        { r: number; g: number; b: number; a: number },
+        { r: number; g: number; b: number; a: number },
+        { r: number; g: number; b: number; a: number },
+      ] = [
         { r: 255, g: 0, b: 0, a: 255 },
         { r: 0, g: 255, b: 0, a: 255 },
         { r: 0, g: 0, b: 255, a: 255 },

@@ -66,7 +66,15 @@ export class Surface {
   /**
    * Efficiently fills a horizontal line segment with clipping.
    */
-  public fillScanline(y: number, x1: number, x2: number, r: number, g: number, b: number, a: number): void {
+  public fillScanline(
+    y: number,
+    x1: number,
+    x2: number,
+    r: number,
+    g: number,
+    b: number,
+    a: number,
+  ): void {
     y = Math.floor(y);
     if (y < 0 || y >= this.height) return;
 

@@ -43,19 +43,19 @@ class LessonManager {
     this.initNavigation();
     this.initInspector();
   }
-private initNavigation() {
-  const items = document.querySelectorAll('.lesson-item');
-  items.forEach((item) => {
-    item.addEventListener('click', () => {
-      const id = (item as HTMLElement).dataset.lesson;
-      if (id) {
-        this.switchLesson(id);
-        items.forEach((i) => i.classList.remove('active'));
-        item.classList.add('active');
-      }
+  private initNavigation() {
+    const items = document.querySelectorAll('.lesson-item');
+    items.forEach((item) => {
+      item.addEventListener('click', () => {
+        const id = (item as HTMLElement).dataset.lesson;
+        if (id) {
+          this.switchLesson(id);
+          items.forEach((i) => i.classList.remove('active'));
+          item.classList.add('active');
+        }
+      });
     });
-  });
-}
+  }
 
   private initInspector() {
     const inspectorCanvas = document.getElementById('inspector-canvas') as HTMLCanvasElement;
