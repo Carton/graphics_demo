@@ -17,7 +17,7 @@ describe('Bilinear Wrapping', () => {
     // x=1.5 -> x0=1, x1=2(wrapped to 0). u=0.5
     // y=0.5 -> y0=0, y1=1. v=0.5
     const p = sampleBilinear(src, 1.5, 0.5, 'repeat');
-    
+
     // R: lerp(lerp(0, 255, 0.5), lerp(255, 0, 0.5), 0.5)
     // R: lerp(127.5, 127.5, 0.5) = 127.5
     expect(p.r).toBeCloseTo(127.5, 1);

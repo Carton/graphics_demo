@@ -200,7 +200,11 @@ export function downsample(src: Surface, dst: Surface, scale: number): void {
  * Helper to wrap coordinates based on the selected mode.
  * Returns coordinates in pixels.
  */
-function wrapCoordinate(v: number, size: number, mode: 'clamp' | 'transparent' | 'repeat' | 'mirror'): number {
+function wrapCoordinate(
+  v: number,
+  size: number,
+  mode: 'clamp' | 'transparent' | 'repeat' | 'mirror',
+): number {
   if (mode === 'repeat') {
     const normV = v / size;
     const wrapped = normV - Math.floor(normV);

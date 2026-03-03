@@ -64,22 +64,18 @@ export class TextureLesson implements Lesson {
 
     const assets = pane.addFolder({ title: 'Assets' });
     assets.addButton({ title: 'Upload Image' }).on('click', () => {
-      
       const input = document.getElementById('texture-upload-input') as HTMLInputElement;
       if (!input) {
-        
         return;
       }
 
       input.onchange = (e) => {
         const file = (e.target as HTMLInputElement).files?.[0];
         if (file) {
-          
           const reader = new FileReader();
           reader.onload = (event) => {
             const img = new Image();
             img.onload = () => {
-              
               this.loadTextureFromImage(img);
               this.manager?.render();
             };
@@ -88,7 +84,7 @@ export class TextureLesson implements Lesson {
           reader.readAsDataURL(file);
         }
       };
-      
+
       input.click();
     });
 
@@ -106,7 +102,6 @@ export class TextureLesson implements Lesson {
 
     this.texture = new Surface(img.width, img.height);
     this.texture.data.set(data.data);
-    
   }
 
   render(surface: Surface): void {
