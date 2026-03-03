@@ -137,6 +137,9 @@ class LessonManager {
     } else if (id === 'region') {
       const { RegionLesson } = await import('./demos/region-lesson');
       this.currentLesson = new RegionLesson();
+    } else if (id === 'composite') {
+      const { CompositeLesson } = await import('./demos/composite-lesson');
+      this.currentLesson = new CompositeLesson();
     }
 
     if (this.currentLesson) {
