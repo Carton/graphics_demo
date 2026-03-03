@@ -150,7 +150,7 @@ export class TextureLesson implements Lesson {
     drawLine(s, p0.x, p0.y, p1.x, p1.y, r, g, b, a);
   }
 
-  updateInspector(x: number, y: number, surface: Surface): string {
+  updateInspector(x: number, y: number, _surface: Surface): string {
     const matrix = Matrix.translation(this.params.tx, this.params.ty)
       .multiply(Matrix.rotation(this.params.rotation))
       .multiply(Matrix.scaling(this.params.scale, this.params.scale))

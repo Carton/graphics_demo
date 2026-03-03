@@ -163,7 +163,7 @@ export class TransformLesson implements Lesson {
     }
   }
 
-  updateInspector(x: number, y: number, surface: Surface): string {
+  updateInspector(_x: number, _y: number, _surface: Surface): string {
     const m = Matrix.translation(this.params.tx, this.params.ty)
       .multiply(Matrix.rotation(this.params.rotation))
       .multiply(Matrix.scaling(this.params.scale, this.params.scale));

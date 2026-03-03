@@ -113,12 +113,12 @@ export class RasterLesson implements Lesson {
         }
       }
     } else {
-      const vertices: [any, any, any] = [
+      const vertices: [{ x: number; y: number }, { x: number; y: number }, { x: number; y: number }] = [
         { x: 0, y: -150 },
         { x: 150, y: 120 },
         { x: -150, y: 120 },
       ];
-      const colors: [any, any, any] = [
+      const colors: [{ r: number; g: number; b: number; a: number }, { r: number; g: number; b: number; a: number }, { r: number; g: number; b: number; a: number }] = [
         { r: 255, g: 0, b: 0, a: 255 },
         { r: 0, g: 255, b: 0, a: 255 },
         { r: 0, g: 0, b: 255, a: 255 },
@@ -130,7 +130,7 @@ export class RasterLesson implements Lesson {
     }
   }
 
-  updateInspector(x: number, y: number, surface: Surface): string {
+  updateInspector(_x: number, _y: number, _surface: Surface): string {
     return `
       <b style="color: var(--accent)">Raster Inspector</b>
       <div style="font-size: 10px; color: #888">

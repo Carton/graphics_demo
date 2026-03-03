@@ -40,8 +40,6 @@ export class BlendingLesson implements Lesson {
     this.isScanning = true;
 
     surface.clear();
-    const w = surface.width;
-    const h = surface.height;
 
     // Phase 1: Draw Destination
     for (let py = 50; py < 250; py++) {
@@ -88,8 +86,7 @@ export class BlendingLesson implements Lesson {
     if (this.isScanning) return;
     surface.clear();
 
-    const w = surface.width;
-    const h = surface.height;
+    surface.clear();
 
     // Draw Dst Rect (Left half)
     this.drawSimpleRect(surface, 50, 50, 200, 200, this.params.dstColor, 'src');
@@ -104,7 +101,7 @@ export class BlendingLesson implements Lesson {
     y: number,
     w: number,
     h: number,
-    color: any,
+    color: { r: number; g: number; b: number; a: number },
     mode: BlendMode,
   ) {
     const srcPixel = premultiply(color.r, color.g, color.b, Math.round(color.a * 255));
@@ -125,7 +122,7 @@ export class BlendingLesson implements Lesson {
     // In a real study tool, we might want to store original src/dst before blending
     // But for this demo, let's show the result and the active formula
 
-    let formula = '';
+    let formula: string;
     let colorPreview = `rgba(${p.r},${p.g},${p.b},${p.a / 255})`;
 
     if (mode === 'src-over') {

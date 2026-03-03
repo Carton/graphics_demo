@@ -86,7 +86,6 @@ class LessonManager {
   }
 
   private drawZoomedGrid(ctx: CanvasRenderingContext2D, cx: number, cy: number) {
-    const size = 15; // 15x15 pixels
     const zoom = 10; // 10x magnification
     ctx.clearRect(0, 0, 150, 150);
 

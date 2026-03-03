@@ -42,7 +42,6 @@ export type BlendMode = 'clear' | 'src' | 'dst' | 'src-over';
  */
 export function blend(src: Pixel, dst: Pixel, mode: BlendMode): Pixel {
   const sa = src.a / 255;
-  const da = dst.a / 255;
 
   switch (mode) {
     case 'clear':

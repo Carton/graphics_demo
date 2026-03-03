@@ -36,7 +36,7 @@ describe('Gradient Triangle', () => {
         { x: 9, y: 0 },
         { x: 0, y: 9 },
       ];
-    const colors: any = [
+    const colors: { r: number; g: number; b: number; a: number }[] = [
       { r: 255, g: 0, b: 0, a: 255 },
       { r: 0, g: 255, b: 0, a: 255 },
       { r: 0, g: 0, b: 255, a: 255 },
