@@ -197,16 +197,38 @@ export function downsample(src: Surface, dst: Surface, scale: number): void {
 }
 
 /**
+ * Helper to wrap coordinates based on the selected mode.
+ * Returns coordinates in pixels.
+ */
+function wrapCoordinate(v: number, size: number, mode: 'clamp' | 'transparent' | 'repeat' | 'mirror'): number {
+  if (mode === 'repeat') {
+    const normV = v / size;
+    const wrapped = normV - Math.floor(normV);
+    return wrapped * size;
+  }
+  if (mode === 'mirror') {
+    const normV = v / size;
+    const wrapped = Math.abs(((normV + 1) % 2) - 1);
+    return wrapped * size;
+  }
+  // Default for clamp/transparent is handled in the sampler
+  return v;
+}
+
+/**
  * Samples a surface at (x, y) using nearest neighbor interpolation.
  */
 export function sampleNearest(
   surface: Surface,
   x: number,
   y: number,
-  wrap: 'clamp' | 'transparent' = 'transparent',
+  wrap: 'clamp' | 'transparent' | 'repeat' | 'mirror' = 'transparent',
 ) {
-  const ix = Math.round(x);
-  const iy = Math.round(y);
+  const wx = wrapCoordinate(x, surface.width, wrap);
+  const wy = wrapCoordinate(y, surface.height, wrap);
+
+  const ix = Math.round(wx);
+  const iy = Math.round(wy);
 
   if (ix < 0 || ix >= surface.width || iy < 0 || iy >= surface.height) {
     if (wrap === 'transparent') return { r: 0, g: 0, b: 0, a: 0 };
@@ -225,46 +247,47 @@ export function sampleBilinear(
   surface: Surface,
   x: number,
   y: number,
-  wrap: 'clamp' | 'transparent' = 'transparent',
+  wrap: 'clamp' | 'transparent' | 'repeat' | 'mirror' = 'transparent',
 ) {
-  const x0 = Math.floor(x);
-  const y0 = Math.floor(y);
+  const wx = wrapCoordinate(x, surface.width, wrap);
+  const wy = wrapCoordinate(y, surface.height, wrap);
+
+  const x0 = Math.floor(wx);
+  const y0 = Math.floor(wy);
   const x1 = x0 + 1;
   const y1 = y0 + 1;
 
-  if (x0 < 0 || x1 >= surface.width || y0 < 0 || y1 >= surface.height) {
+  const clampX = (v: number) => Math.max(0, Math.min(v, surface.width - 1));
+  const clampY = (v: number) => Math.max(0, Math.min(v, surface.height - 1));
+
+  const u = wx - x0;
+  const v = wy - y0;
+
+  // For wrapping modes, we should wrap the neighbor coordinates too
+  const getP = (px: number, py: number) => {
+    if (wrap === 'repeat' || wrap === 'mirror') {
+      const wpx = wrapCoordinate(px, surface.width, wrap);
+      const wpy = wrapCoordinate(py, surface.height, wrap);
+      return surface.getPixel(Math.floor(wpx), Math.floor(wpy));
+    }
+    return surface.getPixel(clampX(px), clampY(py));
+  };
+
+  if (wx < 0 || wx >= surface.width || wy < 0 || wy >= surface.height) {
     if (
       wrap === 'transparent' &&
-      (x < -0.5 || x > surface.width - 0.5 || y < -0.5 || y > surface.height - 0.5)
+      (wx < -0.5 || wx > surface.width - 0.5 || wy < -0.5 || wy > surface.height - 0.5)
     ) {
       return { r: 0, g: 0, b: 0, a: 0 };
     }
-    // Clamp coordinates for the 4-pixel grid
-    const clampX = (v: number) => Math.max(0, Math.min(v, surface.width - 1));
-    const clampY = (v: number) => Math.max(0, Math.min(v, surface.height - 1));
-
-    const u = x - x0;
-    const v = y - y0;
-    const p00 = surface.getPixel(clampX(x0), clampY(y0));
-    const p10 = surface.getPixel(clampX(x1), clampY(y0));
-    const p01 = surface.getPixel(clampX(x0), clampY(y1));
-    const p11 = surface.getPixel(clampX(x1), clampY(y1));
-    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-    return {
-      r: lerp(lerp(p00.r, p10.r, u), lerp(p01.r, p11.r, u), v),
-      g: lerp(lerp(p00.g, p10.g, u), lerp(p01.g, p11.g, u), v),
-      b: lerp(lerp(p00.b, p10.b, u), lerp(p01.b, p11.b, u), v),
-      a: lerp(lerp(p00.a, p10.a, u), lerp(p01.a, p11.a, u), v),
-    };
   }
 
-  const u = x - x0;
-  const v = y - y0;
-  const p00 = surface.getPixel(x0, y0);
-  const p10 = surface.getPixel(x1, y0);
-  const p01 = surface.getPixel(x0, y1);
-  const p11 = surface.getPixel(x1, y1);
+  const p00 = getP(x0, y0);
+  const p10 = getP(x1, y0);
+  const p01 = getP(x0, y1);
+  const p11 = getP(x1, y1);
   const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
   return {
     r: lerp(lerp(p00.r, p10.r, u), lerp(p01.r, p11.r, u), v),
     g: lerp(lerp(p00.g, p10.g, u), lerp(p01.g, p11.g, u), v),
@@ -281,7 +304,7 @@ export function drawSurface(
   src: Surface,
   matrix: Matrix,
   interpolation: 'nearest' | 'bilinear' = 'bilinear',
-  wrap: 'clamp' | 'transparent' = 'transparent',
+  wrap: 'clamp' | 'transparent' | 'repeat' | 'mirror' = 'transparent',
 ): void {
   const corners = [
     { x: 0, y: 0 },
@@ -300,10 +323,21 @@ export function drawSurface(
     minY = Math.min(minY, c.y);
     maxY = Math.max(maxY, c.y);
   }
-  const startX = Math.max(0, Math.floor(minX));
-  const endX = Math.min(dst.width - 1, Math.ceil(maxX));
-  const startY = Math.max(0, Math.floor(minY));
-  const endY = Math.min(dst.height - 1, Math.ceil(maxY));
+
+  // Expansion for Repeat/Mirror: we iterate over the destination's bounds
+  // as the texture might cover the entire destination.
+  // For 'clamp' or 'transparent', we can use the transformed bounds.
+  let startX = Math.max(0, Math.floor(minX));
+  let endX = Math.min(dst.width - 1, Math.ceil(maxX));
+  let startY = Math.max(0, Math.floor(minY));
+  let endY = Math.min(dst.height - 1, Math.ceil(maxY));
+
+  if (wrap === 'repeat' || wrap === 'mirror') {
+    startX = 0;
+    endX = dst.width - 1;
+    startY = 0;
+    endY = dst.height - 1;
+  }
 
   const sampler = interpolation === 'nearest' ? sampleNearest : sampleBilinear;
 
