@@ -49,6 +49,17 @@ export class Region {
     return false;
   }
 
+  /**
+   * Returns a list of X-intervals (spans) for a given scanline Y.
+   */
+  public getSpans(y: number): { x1: number; x2: number }[] {
+    // In our optimized storage, rects in the same band share the same y1, y2.
+    return this.rects
+      .filter((r) => y >= r.y1 && y < r.y2)
+      .map((r) => ({ x1: r.x1, x2: r.x2 }))
+      .sort((a, b) => a.x1 - b.x1);
+  }
+
   public union(other: Region): Region {
     return this.op(other, (a, b) => a || b);
   }
