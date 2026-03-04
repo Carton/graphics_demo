@@ -140,6 +140,9 @@ class LessonManager {
     } else if (id === 'composite') {
       const { CompositeLesson } = await import('./demos/composite-lesson');
       this.currentLesson = new CompositeLesson();
+    } else if (id === 'optimization') {
+      const { OptimizationLesson } = await import('./demos/optimization-lesson');
+      this.currentLesson = new OptimizationLesson();
     }
 
     if (this.currentLesson) {
