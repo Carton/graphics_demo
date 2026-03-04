@@ -22,7 +22,7 @@ describe('Fast Path Execution', () => {
 
     // Over with 50% Red solid
     CompositeDispatcher.composite(dst, null, Matrix.identity(), 'src-over', {
-      solidColor: { r: 128, g: 0, b: 0, a: 128 } // Premultiplied
+      solidColor: { r: 128, g: 0, b: 0, a: 128 }, // Premultiplied
     });
 
     // R: 128 + 0 * (1 - 0.5) = 128
@@ -52,7 +52,7 @@ describe('Fast Path Execution', () => {
     // Solid Red (255,0,0,255) with 50% mask (128)
     CompositeDispatcher.composite(dst, null, Matrix.identity(), 'src-over', {
       solidColor: { r: 255, g: 0, b: 0, a: 255 },
-      maskAlpha: 128
+      maskAlpha: 128,
     });
 
     const p = dst.getPixel(0, 0);

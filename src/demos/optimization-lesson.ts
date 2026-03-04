@@ -88,7 +88,10 @@ export class OptimizationLesson implements Lesson {
         },
       );
     } else {
-      this.lastDispatch = { path: 'GENERIC', description: 'Standard: Full calculation (Dispatcher Disabled)' };
+      this.lastDispatch = {
+        path: 'GENERIC',
+        description: 'Standard: Full calculation (Dispatcher Disabled)',
+      };
       this.renderGeneric(surface);
     }
 
@@ -106,7 +109,14 @@ export class OptimizationLesson implements Lesson {
     if (this.params.useSolidSource) {
       for (let y = 0; y < s.height; y++) {
         for (let x = 0; x < s.width; x++) {
-          s.setPixel(x, y, this.params.solidColor.r, this.params.solidColor.g, this.params.solidColor.b, this.params.solidColor.a);
+          s.setPixel(
+            x,
+            y,
+            this.params.solidColor.r,
+            this.params.solidColor.g,
+            this.params.solidColor.b,
+            this.params.solidColor.a,
+          );
         }
       }
     } else {

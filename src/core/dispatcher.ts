@@ -28,15 +28,27 @@ export class CompositeDispatcher {
     const isIntegerTranslation = matrix.isIntegerTranslation();
 
     if (options.solidColor && mode === 'src-over') {
-      return { path: 'SRC_OVER_SOLID', description: 'Optimized: Filling with solid color (SrcOver)' };
+      return {
+        path: 'SRC_OVER_SOLID',
+        description: 'Optimized: Filling with solid color (SrcOver)',
+      };
     }
 
-    if (isIdentity && mode === 'src' && src && dst.width === src.width && dst.height === src.height) {
+    if (
+      isIdentity &&
+      mode === 'src' &&
+      src &&
+      dst.width === src.width &&
+      dst.height === src.height
+    ) {
       return { path: 'SRC_COPY', description: 'Optimized: Direct memory copy (Identity + Src)' };
     }
 
     if (isIntegerTranslation && src) {
-      return { path: 'TRANSLATE_ONLY', description: 'Optimized: Integer translation loop (No sampling)' };
+      return {
+        path: 'TRANSLATE_ONLY',
+        description: 'Optimized: Integer translation loop (No sampling)',
+      };
     }
 
     return { path: 'GENERIC', description: 'Standard: Full matrix transformation and sampling' };
@@ -73,11 +85,11 @@ export class CompositeDispatcher {
         if (src) {
           const tx = Math.floor(matrix.tx);
           const ty = Math.floor(matrix.ty);
-          
+
           // Fixed point demonstration: calculate start offset
           const fixedX = Fixed.fromFloat(tx);
           const fixedY = Fixed.fromFloat(ty);
-          
+
           const startX = Math.max(0, Fixed.toInt(fixedX));
           const startY = Math.max(0, Fixed.toInt(fixedY));
           const endX = Math.min(dst.width, startX + src.width);

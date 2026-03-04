@@ -22,7 +22,9 @@ describe('Fast Path Dispatcher', () => {
   it('should detect SRC_OVER_SOLID path when source is effectively a solid color', () => {
     // We'll simulate this by passing a null source or a specific flag in analyze
     // For Pixman, a solid source is a 1x1 image with repeat
-    const info = CompositeDispatcher.analyze(dst, null, Matrix.identity(), 'src-over', { solidColor: { r: 255, g: 0, b: 0, a: 255 } });
+    const info = CompositeDispatcher.analyze(dst, null, Matrix.identity(), 'src-over', {
+      solidColor: { r: 255, g: 0, b: 0, a: 255 },
+    });
     expect(info.path).toBe('SRC_OVER_SOLID');
   });
 

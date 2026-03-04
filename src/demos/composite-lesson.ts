@@ -75,13 +75,13 @@ export class CompositeLesson implements Lesson {
     pipeline.addBinding(this.params, 'operator', {
       options: {
         'Source Over': 'src-over',
-        'In': 'in',
-        'Out': 'out',
-        'Atop': 'atop',
-        'XOR': 'xor',
-        'Source': 'src',
-        'Clear': 'clear'
-      }
+        In: 'in',
+        Out: 'out',
+        Atop: 'atop',
+        XOR: 'xor',
+        Source: 'src',
+        Clear: 'clear',
+      },
     });
     pipeline.addBinding(this.params, 'showMaskOnly', { label: 'Visualize Mask' });
 
@@ -90,12 +90,14 @@ export class CompositeLesson implements Lesson {
     srcFolder.addBinding(this.params.srcPos, 'y', { min: -200, max: 200, label: 'Offset Y' });
 
     const maskFolder = pane.addFolder({ title: 'Mask Layer' });
-    maskFolder.addBinding(this.params, 'maskType', {
-      options: { Circle: 'circle', Rectangle: 'rect' }
-    }).on('change', () => {
-      this.updateMaskBuffer();
-      this.manager?.render();
-    });
+    maskFolder
+      .addBinding(this.params, 'maskType', {
+        options: { Circle: 'circle', Rectangle: 'rect' },
+      })
+      .on('change', () => {
+        this.updateMaskBuffer();
+        this.manager?.render();
+      });
     maskFolder.addBinding(this.params, 'maskScale', { min: 0.1, max: 2.0 }).on('change', () => {
       this.updateMaskBuffer();
       this.manager?.render();
@@ -133,7 +135,7 @@ export class CompositeLesson implements Lesson {
     // In our manual implementation, we iterate over surface pixels
     const srcM = Matrix.translation(this.params.srcPos.x, this.params.srcPos.y);
     const maskM = Matrix.translation(this.params.maskPos.x, this.params.maskPos.y);
-    
+
     const srcInv = srcM.invert();
     const maskInv = maskM.invert();
 
@@ -152,7 +154,7 @@ export class CompositeLesson implements Lesson {
         // Apply Blending
         const dP = surface.getPixel(x, y);
         const result = blend(sP, dP, this.params.operator, maskAlpha);
-        
+
         surface.setPixel(x, y, result.r, result.g, result.b, result.a);
       }
     }
