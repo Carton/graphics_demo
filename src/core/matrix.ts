@@ -96,4 +96,32 @@ export class Matrix {
   applyInverse(x: number, y: number): { x: number; y: number } {
     return this.invert().apply(x, y);
   }
+
+  /**
+   * Returns true if the matrix is identity (no transform).
+   */
+  public isIdentity(): boolean {
+    return (
+      Math.abs(this.a - 1) < 1e-10 &&
+      Math.abs(this.b) < 1e-10 &&
+      Math.abs(this.c) < 1e-10 &&
+      Math.abs(this.d - 1) < 1e-10 &&
+      Math.abs(this.tx) < 1e-10 &&
+      Math.abs(this.ty) < 1e-10
+    );
+  }
+
+  /**
+   * Returns true if the matrix only represents an integer translation.
+   */
+  public isIntegerTranslation(): boolean {
+    return (
+      Math.abs(this.a - 1) < 1e-10 &&
+      Math.abs(this.b) < 1e-10 &&
+      Math.abs(this.c) < 1e-10 &&
+      Math.abs(this.d - 1) < 1e-10 &&
+      Number.isInteger(this.tx) &&
+      Number.isInteger(this.ty)
+    );
+  }
 }

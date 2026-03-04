@@ -1,8 +1,7 @@
 import { Pane } from 'tweakpane';
-import { Surface, Pixel } from '../core/surface';
+import { Surface, type Pixel } from '../core/surface';
 import { Matrix } from '../core/matrix';
-import { Fixed } from '../core/fixed';
-import { CompositeDispatcher, DispatchInfo } from '../core/dispatcher';
+import { CompositeDispatcher, type DispatchInfo } from '../core/dispatcher';
 import { drawSurface } from '../core/rasterization';
 import type { Lesson, LessonManager } from '../main';
 
@@ -62,7 +61,6 @@ export class OptimizationLesson implements Lesson {
   render(surface: Surface): void {
     const backup = new Surface(surface.width, surface.height);
     if (this.params.showHeatmap) {
-      // Create a "ground truth" using generic floating point path
       this.renderGeneric(backup);
     }
 
@@ -106,7 +104,6 @@ export class OptimizationLesson implements Lesson {
       .multiply(Matrix.translation(-64, -64));
 
     if (this.params.useSolidSource) {
-      // Manual slow path for solid
       for (let y = 0; y < s.height; y++) {
         for (let x = 0; x < s.width; x++) {
           s.setPixel(x, y, this.params.solidColor.r, this.params.solidColor.g, this.params.solidColor.b, this.params.solidColor.a);
@@ -125,7 +122,6 @@ export class OptimizationLesson implements Lesson {
       const diffA = Math.abs(target.data[i + 3] - reference.data[i + 3]);
 
       if (diffR > 0 || diffG > 0 || diffB > 0 || diffA > 0) {
-        // Highlight difference in Bright Magenta
         target.data[i] = 255;
         target.data[i + 1] = 0;
         target.data[i + 2] = 255;
